@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 router.post('/', auth, multer, commentCtrl.createComment);
+router.post("/:id/like", auth, commentCtrl.likeDislikeComment);
 router.put('/:id', auth, multer, commentCtrl.modifyComment);
 router.delete('/:id', auth, commentCtrl.deleteComment);
 router.get('/:id', auth, commentCtrl.getOneComment);

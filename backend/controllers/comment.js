@@ -56,6 +56,65 @@ exports.deleteComment = (req, res, next) => {
       });
 };
 
+exports.likeDislikeComment = (req, res, next) => {
+    Comment.findOne({ _id: req.params.id })
+        .then(comment => {
+
+
+            switch (req.body.like) {
+                // Si l'utilisateur ajoute un dislike
+                case -1:
+                    Comment.updateOne({ _id: req.params.id }, {
+                        $inc: { dislikes: 1 },
+                        $push: { usersDisliked: req.body.userId },
+                        _id: req.params.id
+                    })
+                        .then(() => res.status(201).json({ message: 'Dislike ajouté !' }))
+                        .catch(error => res.status(400).json({ error }))
+                    break;
+
+                case 0:
+                    
+                    if (comment.usersLiked.find(user => user === req.body.userId)) {
+                        Comment.updateOne({ _id: req.params.id }, {
+                            $inc: { likes: -1 },
+                            $pull: { usersLiked: req.body.userId },
+                            _id: req.params.id
+                        })
+                            .then(() => res.status(201).json({ message: ' Like mis à jour !' }))
+                            .catch(error => res.status(400).json({ error }))
+                    }
+
+                    
+                    if (comment.usersDisliked.find(user => user === req.body.userId)) {
+                        Comment.updateOne({ _id: req.params.id }, {
+                            $inc: { dislikes: -1 },
+                            $pull: { usersDisliked: req.body.userId },
+                            _id: req.params.id
+                        })
+                            .then(() => res.status(201).json({ message: ' Dislike mis à jour !' }))
+                            .catch(error => res.status(400).json({ error }));
+                    }
+                    break;
+
+                // Si l'utilisateur ajoute un like
+                case 1:
+                    Comment.updateOne({ _id: req.params.id }, {
+                        $inc: { likes: 1 },
+                        $push: { usersLiked: req.body.userId },
+                        _id: req.params.id
+                    })
+                        .then(() => res.status(201).json({ message: 'Like ajouté !' }))
+                        .catch(error => res.status(400).json({ error }));
+                    break;
+                default:
+                    return res.status(500).json({ error });
+            }
+        })
+        .catch(error => res.status(500).json({ error }))
+    console.log(req.body);
+};
+
 exports.getOneComment = (req, res, next) => {
     Comment.findOne({ _id: req.params.id })
       .then(comment => res.status(200).json(comment))
