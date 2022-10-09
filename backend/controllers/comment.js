@@ -3,6 +3,7 @@ const fs = require('fs');
 
 exports.createComment = (req, res, next) => {
     const commentObject = JSON.parse(req.body.comment);
+    console.log(commentObject);
     delete commentObject._id;
     delete commentObject._userId;
     const comment = new Comment({
@@ -11,9 +12,10 @@ exports.createComment = (req, res, next) => {
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
     comment.save()
-    .then(() => res.status(201).json({ message: 'Message enregistré !'}))
+    .then(() => res.status(201).json({ message: 'Post créé !'}))
     .catch(error => res.status(400).json({ error }));
 };
+
 
 exports.modifyComment = (req, res, next) => {
   const commentObject = req.file ? {

@@ -1,13 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require("cookie-parser");
+const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
 
 const commentRoutes = require('./routes/comment');
 const userRoutes = require('./routes/user');
 
-mongoose.connect('mongodb+srv://LauraF:Skht7ef@cluster0.4ae2xnh.mongodb.net/PROJECT7_OPENCLASSROOMS?retryWrites=true&w=majority',
+// mongoose.connect('mongodb+srv://LauraF:Skht7ef@cluster0.4ae2xnh.mongodb.net/PROJECT7_OPENCLASSROOMS?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://LauraF:Skht7ef@cluster0.4ae2xnh.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -15,6 +17,9 @@ mongoose.connect('mongodb+srv://LauraF:Skht7ef@cluster0.4ae2xnh.mongodb.net/PROJ
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json({ type: 'application/*+json' }))
+app.use(bodyParser.raw({ type: 'application/vnd.custom-type' }))
+app.use(bodyParser.text({ type: 'text/html' }))
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
