@@ -2,19 +2,28 @@ const Comment = require('../models/comment');
 const fs = require('fs');
 
 exports.createComment = (req, res, next) => {
-    const commentObject = JSON.parse(req.body.comment);
+
+    console.log(req.body.comment)
+    const commentObject = req.body.comment;
     console.log(commentObject);
     delete commentObject._id;
     delete commentObject._userId;
+    let imgUrl ="";
+    console.log("file ",req.file)
+    if(undefined != req.file){
+         imgUrl =  `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    }
+
     const comment = new Comment({
         ...commentObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: imgUrl
     });
     comment.save()
     .then(() => res.status(201).json({ message: 'Post créé !'}))
     .catch(error => res.status(400).json({ error }));
 };
+
 
 
 exports.modifyComment = (req, res, next) => {
