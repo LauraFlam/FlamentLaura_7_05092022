@@ -35,12 +35,12 @@ exports.modifyComment = (req, res, next) => {
   delete commentObject._userId;
   Comment.findOne({_id: req.params.id})
       .then((comment) => {
-          if (comment.userId != req.auth.userId) {
-              res.status(401).json({ message : 'Not authorized'});
+          if (comment.userId == req.auth.userId || isAdmin == true) {
+            Comment.updateOne({ _id: req.params.id}, { ...commentObject, _id: req.params.id})
+            .then(() => res.status(200).json({message : 'Message modifié!'}))
+            .catch(error => res.status(401).json({ error }));
           } else {
-              Comment.updateOne({ _id: req.params.id}, { ...commentObject, _id: req.params.id})
-              .then(() => res.status(200).json({message : 'Message modifié!'}))
-              .catch(error => res.status(401).json({ error }));
+            res.status(401).json({ message : 'Non autorisé'});
           }
       })
       .catch((error) => {
@@ -51,15 +51,15 @@ exports.modifyComment = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
   Comment.findOne({ _id: req.params.id})
       .then(comment => {
-          if (comment.userId != req.auth.userId) {
-              res.status(401).json({message: 'Non autorisé'});
+          if (comment.userId == req.auth.userId || isAdmin == true) {
+            const filename = comment.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+                Comment.deleteOne({_id: req.params.id})
+                    .then(() => { res.status(200).json({message: 'Message supprimé !'})})
+                    .catch(error => res.status(401).json({ error }));
+            });
           } else {
-              const filename = comment.imageUrl.split('/images/')[1];
-              fs.unlink(`images/${filename}`, () => {
-                  Comment.deleteOne({_id: req.params.id})
-                      .then(() => { res.status(200).json({message: 'Message supprimé !'})})
-                      .catch(error => res.status(401).json({ error }));
-              });
+            res.status(401).json({message: 'Non autorisé'});
           }
       })
       .catch( error => {
@@ -85,7 +85,7 @@ exports.likeDislikeComment = (req, res, next) => {
                     break;
 
                 case 0:
-                    
+                    // Si le poste est déjà liké
                     if (comment.usersLiked.find(user => user === req.body.userId)) {
                         Comment.updateOne({ _id: req.params.id }, {
                             $inc: { likes: -1 },
