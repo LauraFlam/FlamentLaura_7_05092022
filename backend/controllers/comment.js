@@ -1,4 +1,5 @@
 const Comment = require('../models/comment');
+const User = require('../models/user');
 const fs = require('fs');
 
 exports.createComment = (req, res, next) => {
@@ -33,9 +34,13 @@ exports.modifyComment = (req, res, next) => {
   } : { ...req.body };
 
   delete commentObject._userId;
+
   Comment.findOne({_id: req.params.id})
       .then((comment) => {
-          if (comment.userId == req.auth.userId || isAdmin == true) {
+        console.log(req.body);
+        console.log(req.user);
+        console.log(req.auth.userId);
+          if (comment.userId == req.auth.userId || User.findOne({isAdmin: 1})) {
             Comment.updateOne({ _id: req.params.id}, { ...commentObject, _id: req.params.id})
             .then(() => res.status(200).json({message : 'Message modifié!'}))
             .catch(error => res.status(401).json({ error }));
@@ -51,7 +56,7 @@ exports.modifyComment = (req, res, next) => {
 exports.deleteComment = (req, res, next) => {
   Comment.findOne({ _id: req.params.id})
       .then(comment => {
-          if (comment.userId == req.auth.userId || isAdmin == true) {
+          if (comment.userId == req.auth.userId || User.findOne({isAdmin: 1})) {
             const filename = comment.imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
                 Comment.deleteOne({_id: req.params.id})
