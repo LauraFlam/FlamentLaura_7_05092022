@@ -1,37 +1,30 @@
 import React, { useState } from "react";
 import axios from 'axios';
+import Error  from "./Error";
 
 const LoginForm = () => {
 
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
+const [errorMessage, setErrorMessage] = useState("");
 
 const handleLogin = (e) => {
   e.preventDefault();
-  const emailError = document.querySelector(".email.error");
-  const passwordError = document.querySelector(".password.error");
 
   axios({
     method: "post",
-    url: `http://localhost3000/api/auth/login`,
+    url: `http://localhost:3000/api/auth/login`,
     withCredentials: true,
     data: {email, password},
   })
-  .then((res) => {
-    console.log(res);
-    if (res.data.errors) {
-      emailError.innerHTML = res.data.errors.email;
-      passwordError.innerHTML = res.data.errors.password;
-    } else {
-      window.location = "/";
-    }
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  .then((res) => {window.location = "/"})
+  .catch((err) => {setErrorMessage(err.response.data.error)});
 };
 
+
   return (
+    <>
+    {errorMessage && <Error className="alert alert-error" value={errorMessage} />}
     <form action="" onSubmit={handleLogin} id="sign-up-form">
       <label>Email</label>
       <br />
@@ -45,6 +38,7 @@ const handleLogin = (e) => {
       <br />
       <input type="submit" value="Se connecter" />
     </form>
+    </>
   );
 };
 
