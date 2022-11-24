@@ -1,9 +1,13 @@
 import React from 'react';
+import Log from "../components/Log";
 
 const Login = () => {
+
   return (
-    <div>
-      Login
+    <div className="login-page">
+      <div className="login-container">
+        <Log />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,29 @@
+.login-page {
+  margin: 80px auto 0;
+  max-width: 1000px;
+
+  .connection-form {
+    border: none;
+    background: $color2;
+    min-width: 490px;
+    width: 90%;
+    text-align: center;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 20px;
+
+    .form-container {
+      display: grid;
+      grid-template-columns: 30% 70%;
+
+      ul {
+        li {
+          cursor: pointer;
+          border-radius: 20px;
+          padding: 10px 20px;
+          list-style-type: none;
+        }
+      }
+    }
+  }
+}
